@@ -44,7 +44,7 @@ class Resources:
     """
     # If any fields changed, increment the version. For backward compatibility,
     # modify the __setstate__ method to handle the old version.
-    _VERSION = 18
+    _VERSION = 19
 
     def __init__(
         self,
@@ -59,6 +59,7 @@ class Resources:
         region: Optional[str] = None,
         zone: Optional[str] = None,
         image_id: Union[Dict[str, str], str, None] = None,
+        disk_encrypted: Optional[bool] = None,
         disk_size: Optional[int] = None,
         disk_tier: Optional[Union[str, resources_utils.DiskTier]] = None,
         ports: Optional[Union[int, str, List[str], Tuple[str]]] = None,
@@ -127,6 +128,7 @@ class Resources:
                 'us-east1': 'ami-1234567890abcdef0'
               }
 
+          disk_encrypted: True if the machine volume should be encrypted
           disk_size: the size of the OS disk in GiB.
           disk_tier: the disk performance tier to use. If None, defaults to
             ``'medium'``.
@@ -164,6 +166,8 @@ class Resources:
         if job_recovery is not None:
             if job_recovery.strip().lower() != 'none':
                 self._job_recovery = job_recovery.upper()
+
+        self._disk_encrypted = disk_encrypted or False
 
         if disk_size is not None:
             if round(disk_size) != disk_size:
@@ -417,6 +421,10 @@ class Resources:
     @property
     def job_recovery(self) -> Optional[str]:
         return self._job_recovery
+
+    @property
+    def disk_encrypted(self) -> bool:
+        return self._disk_encrypted
 
     @property
     def disk_size(self) -> int:
@@ -1196,6 +1204,7 @@ class Resources:
                                           self.accelerator_args),
             use_spot=override.pop('use_spot', use_spot),
             job_recovery=override.pop('job_recovery', self.job_recovery),
+            disk_encrypted=override.pop('disk_encrypted', self.disk_encrypted),
             disk_size=override.pop('disk_size', self.disk_size),
             region=override.pop('region', self.region),
             zone=override.pop('zone', self.zone),
@@ -1355,6 +1364,7 @@ class Resources:
             # spot_recovery and job_recovery are guaranteed to be mutually
             # exclusive by the schema validation.
             resources_fields['job_recovery'] = config.pop('job_recovery', None)
+        resources_fields['disk_encrypted'] = config.pop('disk_encrypted', None)
         resources_fields['disk_size'] = config.pop('disk_size', None)
         resources_fields['region'] = config.pop('region', None)
         resources_fields['zone'] = config.pop('zone', None)
@@ -1377,6 +1387,8 @@ class Resources:
                 resources_fields['accelerator_args'])
         if resources_fields['disk_size'] is not None:
             resources_fields['disk_size'] = int(resources_fields['disk_size'])
+        if resources_fields['disk_encrypted'] is not None:
+            resources_fields['disk_encrypted'] = resources_fields['disk_encrypted']
 
         assert not config, f'Invalid resource args: {config.keys()}'
         return Resources(**resources_fields)
@@ -1399,6 +1411,7 @@ class Resources:
         if self._use_spot_specified:
             add_if_not_none('use_spot', self.use_spot)
         add_if_not_none('job_recovery', self.job_recovery)
+        add_if_not_none('disk_encrypted', self.disk_encrypted)
         add_if_not_none('disk_size', self.disk_size)
         add_if_not_none('region', self.region)
         add_if_not_none('zone', self.zone)
@@ -1441,6 +1454,9 @@ class Resources:
 
             disk_size = state.pop('disk_size', _DEFAULT_DISK_SIZE_GB)
             state['_disk_size'] = disk_size
+
+            disk_encrypted = state.pop('disk_encrypted ', False)
+            state['_disk_encrypted'] = disk_encrypted
 
         if version < 2:
             self._region = None

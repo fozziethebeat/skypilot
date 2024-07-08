@@ -91,6 +91,9 @@ def _get_single_resources_schema():
             'job_recovery': {
                 'type': 'string',
             },
+            'disk_encrypted': {
+                'type': 'boolean',
+            },
             'disk_size': {
                 'type': 'integer',
             },
