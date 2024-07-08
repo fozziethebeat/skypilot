@@ -1388,7 +1388,8 @@ class Resources:
         if resources_fields['disk_size'] is not None:
             resources_fields['disk_size'] = int(resources_fields['disk_size'])
         if resources_fields['disk_encrypted'] is not None:
-            resources_fields['disk_encrypted'] = resources_fields['disk_encrypted']
+            resources_fields['disk_encrypted'] = (
+                resources_fields['disk_encrypted'])
 
         assert not config, f'Invalid resource args: {config.keys()}'
         return Resources(**resources_fields)

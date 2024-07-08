@@ -1,0 +1,25 @@
+# A minimal soc2 example.
+#
+# Runs a task that simply lists the default conda environments.
+#
+# Usage:
+#   sky launch -c min-soc2 aws_soc2.yaml
+#   sky down min
+
+name: minimal
+
+resources:
+  cloud: aws
+  # Disk volumes typically need to be encrypted for SOC2 compliance.
+  disk_encrypted: true
+  # Various SOC2 compliance tools check prod versus non-prod status. 
+  # Use labels (which become tags) for this.
+  labels:
+    "env": "prod"
+
+setup: |
+  echo "running setup"
+
+run: |
+  conda env list
+
