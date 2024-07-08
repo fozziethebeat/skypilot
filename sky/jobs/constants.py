@@ -13,7 +13,12 @@ JOBS_TASK_YAML_PREFIX = '~/.sky/managed_jobs'
 # OOM (each vCPU can have 4 jobs controller processes as we set the CPU
 # requirement to 0.25, and 3 GB is barely enough for 4 job processes).
 # We use 50 GB disk size to reduce the cost.
-CONTROLLER_RESOURCES = {'cpus': '8+', 'memory': '3x', 'disk_size': 50}
+CONTROLLER_RESOURCES = {
+    'cpus': '8+',
+    'memory': '3x',
+    'disk_encrypted': False,
+    'disk_size': 50,
+}
 
 # Max length of the cluster name for GCP is 35, the user hash to be attached is
 # 4+1 chars, and we assume the maximum length of the job id is 4+1, so the max

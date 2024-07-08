@@ -14,25 +14,31 @@ from sky.utils import controller_utils
         ('jobs', {}, {
             'cpus': '8+',
             'memory': '3x',
+            'disk_encrypted': False,
             'disk_size': 50
         }),
         ('jobs', {
             'cpus': '4+',
+            'disk_encrypted': True,
             'disk_size': 100
         }, {
             'cpus': '4+',
             'memory': '3x',
+            'disk_encrypted': True,
             'disk_size': 100
         }),
         ('serve', {}, {
             'cpus': '4+',
+            'disk_encrypted': False,
             'disk_size': 200
         }),
         ('serve', {
             'memory': '32+',
+            'disk_encrypted': True,
         }, {
             'cpus': '4+',
             'memory': '32+',
+            'disk_encrypted': True,
             'disk_size': 200
         }),
     ])
